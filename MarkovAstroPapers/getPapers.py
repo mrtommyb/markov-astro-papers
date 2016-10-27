@@ -12,10 +12,12 @@ from __future__ import (absolute_import, division, print_function,
 
 # Standard library
 import json
+import re
+import argparse
 
 # Module specific
-#import ads
-import ads.sandbox as ads
+import ads
+#import ads.sandbox as ads
 import pandas as pd
 
 # Which metadata fields do we want to retrieve from the ADS API?
@@ -47,15 +49,36 @@ def makeDataframe(year=1991,rows=200000, mincite=2):
 
 def returnLastnameTitle(q):
     # last name
-    lastname = q.first_author_norm.split(',')[0]
+    try:
+        lastname = q.first_author_norm.split(',')[0]
+        lastname = re.sub(r'([^\s\w]|_)+', '', lastname)
+    except AttributeError:
+        return ['none','none']
 
     # paper title
-    title = q.title[0]
-    symbols = ['.',',',':',';','?','-']
-    for s in symbols:
-        title = title.strip(s)
+    try:
+        title = q.title[0]
+        title = re.sub(r'([^\s\w]|_)+', '', title)
+    except TypeError:
+        return ['none','none']
 
     return [lastname,title]
 
+def toJson(year=1991,rows=200000, mincite=2):
+    df = makeDataframe(year=year,rows=rows, mincite=mincite)
+    df.to_json('data/{}.json'.format(year))
 
 
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description="download papers")
+
+    parser.add_argument('--year', type=float, default=None,
+                        help='download papers from this year')
+    parser.add_argument('--mincite', type=float, default=2,
+                        help='minimum citations to be included')
+
+    args = parser.parse_args()
+
+    toJson(year=args.year,mincite=args.mincite)
