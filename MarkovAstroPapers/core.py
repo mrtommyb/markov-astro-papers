@@ -9,6 +9,9 @@ from __future__ import (absolute_import, division, print_function,
 
 import markovify
 import pandas
+import random
+import argparse
+import pandas as pd
 
 from twython import Twython
 from secrets import *
@@ -22,11 +25,32 @@ def printReference(year):
 
     author = df['lastname'].value_counts()[df['lastname'].value_counts() > 1].sample().index[0]
 
-    print('{} et al., {} ({})'.format(author,outtitle,year))
+    return '{} et al., {} ({})'.format(author,outtitle,year)
 
 def post_tweet(status,):
     """Post an animated gif and associated status message to Twitter."""
     twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-    response = twitter.update_status(status=status, )
-    print(response)
+    response = twitter.update_status(status=status)
+    print('posting:')
+    print(status)
+    #print(response)
     return twitter, response
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description="post tweet")
+
+    parser.add_argument('--year', type=int, default=0,
+                        help='year of tweet to post')
+
+    args = parser.parse_args()
+    if args.year == 0:
+        year = random.randint(1850,2016)
+        status = printReference(year)
+        q = post_tweet(status)
+    else:
+        status = printReference(args.year)
+        q = post_tweet(status)
+
+

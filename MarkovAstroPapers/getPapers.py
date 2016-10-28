@@ -27,7 +27,7 @@ FIELDS = ['pub', 'citation_count', 'year', 'first_author_norm',
 
 def getPapers(year=1991,rows=200000, mincite=2):
 
-    query = ads.SearchQuery(rows=rows, 
+    query = ads.SearchQuery(rows=rows, max_pages=10, 
         year=year, 
         fl=FIELDS, 
         database = "astronomy", sort='citation_count desc',
@@ -58,6 +58,7 @@ def returnLastnameTitle(q):
     # paper title
     try:
         title = q.title[0]
+        title = re.sub('-',' ', title)
         title = re.sub(r'([^\s\w]|_)+', '', title)
     except TypeError:
         return ['none','none']
@@ -74,10 +75,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="download papers")
 
-    parser.add_argument('--year', type=float, default=None,
+    parser.add_argument('--year', type=int, default=None,
                         help='download papers from this year')
-    parser.add_argument('--mincite', type=float, default=2,
+    parser.add_argument('--mincite', type=int, default=2,
                         help='minimum citations to be included')
+    parser.add_argument('--rows', type=int, default=2000,
+                        help='how many rows')
 
     args = parser.parse_args()
 
