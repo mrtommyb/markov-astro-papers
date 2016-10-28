@@ -36,6 +36,22 @@ def post_tweet(status,):
     #print(response)
     return twitter, response
 
+def core(args=None):
+    parser = argparse.ArgumentParser(
+        description="post tweet")
+
+    parser.add_argument('--year', type=int, default=0,
+                        help='year of tweet to post')
+
+    args = parser.parse_args()
+    if args.year == 0:
+        year = random.randint(1850,2016)
+        status = printReference(year)
+        q = post_tweet(status)
+    else:
+        status = printReference(args.year)
+        q = post_tweet(status)
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
