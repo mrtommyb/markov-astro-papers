@@ -16,12 +16,12 @@ import pandas as pd
 from twython import Twython
 from secrets import *
 
-def printReference(year):
+def printReference(year, state_size=1, characters=90):
     df = pd.read_json('data/{}.json'.format(year), )
     df.sort_index(inplace=True)
     textstr = '. '.join([df.title[i] for i in range(df.shape[0])])
-    text_model = markovify.Text(textstr, state_size=1, )
-    outtitle = text_model.make_short_sentence(140)
+    text_model = markovify.Text(textstr, state_size=state_size, )
+    outtitle = text_model.make_short_sentence(characters)
 
     author = df['lastname'].value_counts()[df['lastname'].value_counts() > 1].sample().index[0]
 
@@ -59,14 +59,20 @@ if __name__ == '__main__':
 
     parser.add_argument('--year', type=int, default=0,
                         help='year of tweet to post')
+    parser.add_argument('--state_size', type=int, default=1,
+                        help='how many words per to include together')
+    parser.add_argument('--characters', type=int, default=110,
+                        help='characters in title')
 
     args = parser.parse_args()
     if args.year == 0:
         year = random.randint(1850,2016)
-        status = printReference(year)
+        state_size = random.randint(1,2)
+        characters = random.randint(90,125)
+        status = printReference(year, state_size=state_size, characters=characters)
         q = post_tweet(status)
     else:
-        status = printReference(args.year)
+        status = printReference(args.year, args.state_size, args.characters)
         q = post_tweet(status)
 
 
