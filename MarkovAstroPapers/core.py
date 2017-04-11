@@ -17,7 +17,7 @@ from twython import Twython
 from secrets import *
 
 def printReference(year, state_size=1, characters=90):
-    df = pd.read_json('data/{}.json'.format(year), )
+    df = pd.read_json('/home/tom/github/markov-astro-papers/MarkovAstroPapers/data/{}.json'.format(year), )
     df.sort_index(inplace=True)
     textstr = '. '.join([df.title[i] for i in range(df.shape[0])])
     text_model = markovify.Text(textstr, state_size=state_size, )
@@ -66,9 +66,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.year == 0:
-        year = random.randint(1850,2016)
-        state_size = random.randint(1,2)
-        characters = random.randint(90,125)
+        zoro = random.randint(0,2)
+	if zoro == 0:
+            year = random.randint(1995,2016)
+            state_size = random.randint(2,3)
+        elif zoro == 1:
+            year = random.randint(1975,2016)
+            state_size = random.randint(2,3)
+        elif zoro == 2:
+            state_size = random.randint(2,3)
+            year = random.randint(1850,2016)
+        characters = random.randint(90,115)
         status = printReference(year, state_size=state_size, characters=characters)
         q = post_tweet(status)
     else:
